@@ -18,14 +18,15 @@ declare
 begin
   if TG_OP = 'INSERT' then
         Data := (select hstore(i) || hstore('old_category_id',null::text) from items i where i.item_id = NEW.item_id);
-  end if;
   elsif TG_OP = 'UPDATE' then
     if OLD.last_update_txtime is distinct from NEW.last_update_txtime then
         data := (select hstore(i)|| hstore('old_category_id',OLD.category_id::text) from items i where i.item_id = NEW.item_id);
     end if;
   end if;
 
-perform xrpc._call(xrpc.x_qname('q_items_dt'), 'consumer_db', 'accept_item', data);
+  if data is not null then  
+        perform xrpc._call(xrpc.x_qname('q_items_dt'), 'consumer_db', 'accept_item', data);
+  end if;
   return NULL; -- deferred trigger
 end
 $BODY$

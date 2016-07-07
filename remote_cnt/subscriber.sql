@@ -55,7 +55,7 @@ CREATE OR REPLACE FUNCTION delete_user_cnt(i_args hstore)
   RETURNS text AS
 $BODY$
 begin
-    delete from user_items_cnt where user_id = (i_args->'user_id');
+    delete from user_items_cnt where user_id = (i_args->'user_id')::int;
     return 'OK';
 end
 $BODY$
